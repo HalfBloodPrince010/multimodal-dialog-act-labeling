@@ -6,19 +6,19 @@ config = {
     # Data 
     "data_dir":os.path.join(os.getcwd(), 'data'),
     "dataset":"switchboard",
-    "text_field":"",
-    "label_field":"",
+    "text_field":"da_token",
+    "label_field":"da_label",
 
     "max_len":256,
     "batch_size":64,
     "num_workers":4,
     
     # Model
-    "model_name":"",
+    "model_name":"roberta-base",
     "hidden_size":768,
-    "num_classes":43, # there are 43 classes in switchboard corpus
+    "num_classes":43, # There are 43 classes in Switchboard Corpus
     
-    # training
+    # Training
     "save_dir":"./",
     "project":"dialogue-act-label-classification",
     "run_name":"context-aware-attention-dac",

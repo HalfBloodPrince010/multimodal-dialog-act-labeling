@@ -5,17 +5,16 @@ class DialogDataset(Dataset):
     
     _label_dict = dict()
     
-    def __init__(self, tokenizer, data, text_field = "clean_text", label_field="act_label_1", max_len=512):
+    def __init__(self, tokenizer, data, text_field = "da_token", label_field="da_label", max_len=512):
         
         """
         Process the text, here in each row, we have a word, group them by sentenceID and then form a list[str],which can be passed to the tokenizer.
         Tokenizer, we will take list[str], and pass it to encode/encode_plus, to get the token ID's
         """
-
-        self.text = 
+        self.text = data[text_field]
 
         # === Process the Labels - Pick one per sentence ID ===  
-        self.acts = 
+        self.acts = data[label_field]
 
         # Tokenizer, since text is alread split up into list[str], just pass it through the pretrainer BERT/roBERTa encode or enocde_plus
         self.tokenizer = tokenizer
@@ -30,10 +29,14 @@ class DialogDataset(Dataset):
         for cls in classes:
             if cls not in DialogDataset._label_dict.keys():
                 DialogDataset._label_dict[cls]=len(DialogDataset._label_dict.keys())
+
+        print("Labels:",self._label_dict,"\nLength:", len(self._label_dict))
+        print("Exiting..\n")
+        exit(0)
     
     def __len__(self):
         # === First group by sentenceID/or use Unique SentenceIDs ==
-        return 
+        return len(set(data['sent_id']))
     
     def label_dict(self):
         return DialogDataset._label_dict
