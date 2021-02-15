@@ -27,7 +27,7 @@ class DialogActClassificationProsody(nn.Module):
     
     def forward(self, batch):
         """
-            x.shape = [batch, seq_len, hidden_size]
+        DACProsody Data shapes and sizes
         """
         
         word_outputs = self.utterance_word_embeddings(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'], seq_len=batch['seq_len'].tolist())
