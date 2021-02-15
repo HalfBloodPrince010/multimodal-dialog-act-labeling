@@ -32,3 +32,13 @@ class DialogActClassificationProsody(nn.Module):
         
         word_outputs = self.utterance_word_embeddings(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'], seq_len=batch['seq_len'].tolist())
         
+        # == Get Speech Features ==
+
+        # Concatenate Word and Speech Vectors
+
+        # Use RNN/LSTM to get a Vector representation of entire sentence
+
+
+        # Pass the Vector representation obtained above to classifier.
+
+        return word_outputs        
