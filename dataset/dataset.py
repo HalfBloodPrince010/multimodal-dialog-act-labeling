@@ -1,16 +1,18 @@
 from torch.utils.data import Dataset, DataLoader
 import torch
+import pandas as pd
+
 
 class DialogDataset(Dataset):
     
-    _label_dict = dict()
-    
-    def __init__(self, tokenizer, data, text_field = "da_token", label_field="da_label", max_len=512):
+    def __init__(self, tokenizer, data, text_field = "da_token", label_field="da_label", max_len=512, label_dict = None):
         
         """
         Process the text, here in each row, we have a word, group them by sentenceID and then form a list[str],which can be passed to the tokenizer.
         Tokenizer, we will take list[str], and pass it to encode/encode_plus, to get the token ID's
         """
+        self.length =  len(data['sent_id'])
+        
         self.text = data[text_field]
 
         # === Process the Labels - Pick one per sentence ID ===  
@@ -19,34 +21,31 @@ class DialogDataset(Dataset):
         # Tokenizer, since text is alread split up into list[str], just pass it through the pretrainer BERT/roBERTa encode or enocde_plus
         self.tokenizer = tokenizer
 
-
+        # == TODO : Add other columns ==
+       
         self.max_len = max_len
         
-        
-        # Build/Update the Label dictionary 
+        self.label_dict = label_dict
+        # Update the Label dictionary, which wasn't done in trainer class, Training data has only 41 labels, migth cause problem during val and test, hence update.
+
+        #if label_dict is not None: 
         classes = sorted(set(self.acts))
         
         for cls in classes:
-            if cls not in DialogDataset._label_dict.keys():
-                DialogDataset._label_dict[cls]=len(DialogDataset._label_dict.keys())
-
-        print("Labels:",self._label_dict,"\nLength:", len(self._label_dict))
-        print("Exiting..\n")
-        exit(0)
+            if cls not in self.label_dict.keys():
+                self.label_dict[cls]=len(self.label_dict.keys())
     
     def __len__(self):
-        # === First group by sentenceID/or use Unique SentenceIDs ==
-        return len(set(data['sent_id']))
+        # === Unique SentenceIDs ==
+        return self.length
     
     def label_dict(self):
-        return DialogDataset._label_dict
+        return self.label_dict
     
     def __getitem__(self, index):
         
         text = self.text[index]
         act = self.acts[index]
-        label = DialogDataset._label_dict[act]
-        
         input_encoding = self.tokenizer.encode_plus(
             text=text, # List[str] or str or list[int](tokens)
             truncation=True,
@@ -59,6 +58,10 @@ class DialogDataset(Dataset):
         # Number of words in a sentence, if we have string then use -- len(self.tokenize.tokenize(text))
         seq_len = len(text)
         
+        print("Sequence Length:", seq_len)
+        print("Input encoding\n", input_encoding)
+        print(len(input_encoding['input_ids'][0]))
+        print(len(input_encoding['attention_mask'][0]))
         return {
             "text":text,
             "input_ids":input_encoding['input_ids'].squeeze(),
