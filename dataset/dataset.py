@@ -5,7 +5,7 @@ import pandas as pd
 
 class DialogDataset(Dataset):
     
-    def __init__(self, tokenizer, data, text_field = "da_token", label_field="da_label", max_len=512, label_dict = None):
+    def __init__(self, tokenizer, data, text_field = "da_token", label_field="da_label", filenum="filenum", speaker="true_speaker", s_time="start_time", e_time="end_time", max_len=512, label_dict = None):
         
         """
         Process the text, here in each row, we have a word, group them by sentenceID and then form a list[str],which can be passed to the tokenizer.
@@ -14,7 +14,7 @@ class DialogDataset(Dataset):
         self.length =  len(data['sent_id'])
         
         self.text = data[text_field]
-
+        
         # === Process the Labels - Pick one per sentence ID ===  
         self.acts = data[label_field]
 
@@ -22,7 +22,14 @@ class DialogDataset(Dataset):
         self.tokenizer = tokenizer
 
         # == TODO : Add other columns ==
-       
+        self.filenum = data[filenum]
+
+        self.speaker = data[speaker]
+
+        self.start_time = data[s_time]
+
+        self.end_time = data[e_time]
+
         self.max_len = max_len
         
         self.label_dict = label_dict
@@ -46,7 +53,7 @@ class DialogDataset(Dataset):
         
         text = self.text[index]
         act = self.acts[index]
-        input_encoding = self.tokenizer.encode_plus(
+        input_encoding = self.tokenizer.encode(
             text=text, # List[str] or str or list[int](tokens)
             truncation=True,
             max_length=self.max_len,
@@ -56,12 +63,16 @@ class DialogDataset(Dataset):
         )
         
         # Number of words in a sentence, if we have string then use -- len(self.tokenize.tokenize(text))
-        seq_len = len(text)
+        seq_len = len(list(text))
+       
+        filenum = self.filenum[index]
+ 
+        true_speaker = self.speaker[index]
+
+        start_time = self.start_time[index]
+
+        end_time = self.end_time[index]
         
-        print("Sequence Length:", seq_len)
-        print("Input encoding\n", input_encoding)
-        print(len(input_encoding['input_ids'][0]))
-        print(len(input_encoding['attention_mask'][0]))
         return {
             "text":text,
             "input_ids":input_encoding['input_ids'].squeeze(),

@@ -30,7 +30,8 @@ if __name__=="__main__":
     train_data_processed = pd.DataFrame(data_list)
     # === Adding training data to new modified .csv ===
     train_data_processed.to_csv(os.path.join(config['data_dir'], "processed_train.csv"), index=False)
- 
+    # === Adding training data to pickle file ===
+    pd.to_pickle(train_data_processed, os.path.join(config['data_dir'], "processed_train.pkl")) 
     # Process Test and Validation Data
     data_list = []
     exit(0)  
