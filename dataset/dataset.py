@@ -21,7 +21,7 @@ class DialogDataset(Dataset):
         # Tokenizer, since text is alread split up into list[str], just pass it through the pretrainer BERT/roBERTa encode or enocde_plus
         self.tokenizer = tokenizer
 
-        # == TODO : Add other columns ==
+        # == Other columns ==
         self.filenum = data[filenum]
 
         self.speaker = data[speaker]
@@ -79,5 +79,9 @@ class DialogDataset(Dataset):
             "attention_mask":input_encoding['attention_mask'].squeeze(),
             "seq_len":seq_len,
             "act":act,
+            "filenum":filename,
+            "true_speaker":true_speaker,
+            "start_time":start_time,
+            "end_time":end_time,
             "label":torch.tensor([label], dtype=torch.long),
         }
