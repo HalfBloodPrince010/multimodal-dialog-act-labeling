@@ -8,13 +8,14 @@ config = {
     "dataset":"switchboard",
     "text_field":"da_token",
     "label_field":"da_label",
+    "pitch":os.path.join(os.getcwd(),'data/pitch_json'),
 
-    "max_len":256,
+    "max_len":128,
     "batch_size":64,
     "num_workers":4,
     
     # Model
-    "model_name":"roberta-base",
+    "model_name":"bert-base-uncased",
     "hidden_size":768,
     "num_classes":43, # There are 43 classes in Switchboard Corpus
     

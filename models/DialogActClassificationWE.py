@@ -2,11 +2,13 @@ import torch.nn as nn
 import torch
 from .UtteranceWordEmbeddings import UtteranceWordEmbeddings
 
-class DialogActClassificationProsody(nn.Module):
+"Classification with just Word Embeddings"
+
+class DialogActClassificationWE(nn.Module):
     
-    def __init__(self, model_name="roberta-base", hidden_size=768, num_classes=18, device=torch.device("cpu")):
+    def __init__(self, model_name="bert-base-uncased", hidden_size=768, num_classes=18, device=torch.device("cpu")):
         
-        super(DialogActClassificationProsody, self).__init__()
+        super(DialogActClassificationWE, self).__init__()
         
         self.in_features = hidden_size
         
@@ -27,20 +29,22 @@ class DialogActClassificationProsody(nn.Module):
     
     def forward(self, batch):
         """
-        DACProsody Data shapes and sizes
+        DAC Word Embeddings Data shapes and sizes
+        (Batch_size, max_length, hidden_size) --> (64, 128, 768)
+
+        Just get the first vector, which is a CLS token, so (64, 128, 768) --> (64, 768)
+
+        Pass this (Batch_size, [CLS]) to a classifier and check using the labels.
+
+        [CLS} dim here is 768
         """
         
         word_outputs = self.utterance_word_embeddings(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'], seq_len=batch['seq_len'].tolist())
-        
-        print("Exiting from the DACProsody")
+       
+        features = word_outputs[:, 0, :]  
+        print("Exiting from the DACProsody, Feature shape", features.shape)
         exit(0)
-        # == Get Speech Features ==
 
-        # Concatenate Word and Speech Vectors
-
-        # Use RNN/LSTM to get a Vector representation of entire sentence
-
-
-        # Pass the Vector representation obtained above to classifier.
+        # Pass through a classifier
 
         return word_outputs        

@@ -32,6 +32,10 @@ class DialogDataset(Dataset):
 
         self.max_len = max_len
         
+        #self.input_ids = data['input_ids']
+
+        #self.attention_mask = data['attention_mask']
+        
         self.label_dict = label_dict
         # Update the Label dictionary, which wasn't done in trainer class, Training data has only 41 labels, migth cause problem during val and test, hence update.
 
@@ -50,10 +54,14 @@ class DialogDataset(Dataset):
         return self.label_dict
     
     def __getitem__(self, index):
-        
+
         text = self.text[index]
+        
         act = self.acts[index]
-        input_encoding = self.tokenizer.encode(
+        
+        label = self.label_dict[act]
+        
+        input_encoding = self.tokenizer.encode_plus(
             text=text, # List[str] or str or list[int](tokens)
             truncation=True,
             max_length=self.max_len,
@@ -61,7 +69,7 @@ class DialogDataset(Dataset):
             return_attention_mask=True,
             padding="max_length", # Useful if using multiple sentences, to make them all same D
         )
-        
+
         # Number of words in a sentence, if we have string then use -- len(self.tokenize.tokenize(text))
         seq_len = len(list(text))
        
@@ -72,6 +80,10 @@ class DialogDataset(Dataset):
         start_time = self.start_time[index]
 
         end_time = self.end_time[index]
+
+        # input_ids = self.input_ids[index]
+
+        # attention_mask = self.attention_mask[index]
         
         return {
             "text":text,
@@ -79,7 +91,7 @@ class DialogDataset(Dataset):
             "attention_mask":input_encoding['attention_mask'].squeeze(),
             "seq_len":seq_len,
             "act":act,
-            "filenum":filename,
+            "filenum":filenum,
             "true_speaker":true_speaker,
             "start_time":start_time,
             "end_time":end_time,
