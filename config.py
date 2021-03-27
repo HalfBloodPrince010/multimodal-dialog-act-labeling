@@ -11,10 +11,10 @@ config = {
     "pitch":os.path.join(os.getcwd(),'data/pitch_json'),
 
     "max_len":128,
-    "batch_size":64,
+    "batch_size":8,
     "num_workers":4,
-    
-    # Model
+
+    #Model
     "model_name":"bert-base-uncased",
     "hidden_size":768,
     "num_classes":43, # There are 43 classes in Switchboard Corpus
@@ -29,6 +29,6 @@ config = {
     "filepath":"./checkpoints/{epoch}-{val_accuracy:4f}",
     "precision":32,
     "average":"micro",
-    "epochs":100,
+    "epochs":10,
     "device":torch.device("cuda" if torch.cuda.is_available() else "cpu"),
 }
