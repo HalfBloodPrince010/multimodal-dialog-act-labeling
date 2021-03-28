@@ -88,7 +88,7 @@ def train(checkpoint_dir=None, data_dir=None, data_config=None):
         validation_loss.append(val_loss)
         print("Validation accuracy :", val_accuracy)
     
-        if epoch%200 == 0:
+        if epoch%2 == 0:
             try:
                 os.mkdir(checkpoint_dir)
                 logging.info('Created checkpoint directory')
@@ -106,7 +106,7 @@ def train(checkpoint_dir=None, data_dir=None, data_config=None):
     print("f1-score: ",f1_score)
     print("Test Accuracy: ", test_accuracy)
     # == Train Loss Curves ==
-    plt.figure(figsize=(20,10))
+    plt.figure(figsize=(15,7))
     plt.subplot(2, 1, 1)
     plt.title('Training loss')
     plt.plot(train_loss, '-o')
@@ -114,7 +114,7 @@ def train(checkpoint_dir=None, data_dir=None, data_config=None):
     plt.savefig('./plots/train_loss.png')
 
 # == Validation Loss Curves ==
-    plt.figure(figsize=(20,10))
+    plt.figure(figsize=(15,7))
     plt.subplot(2, 1, 1)
     plt.title('Validation loss')
     plt.plot(validation_loss, '-o')

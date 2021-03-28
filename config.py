@@ -11,7 +11,7 @@ config = {
     "pitch":os.path.join(os.getcwd(),'data/pitch_json'),
 
     "max_len":128,
-    "batch_size":8,
+    "batch_size":128,
     "num_workers":4,
 
     #Model
@@ -29,6 +29,6 @@ config = {
     "filepath":"./checkpoints/{epoch}-{val_accuracy:4f}",
     "precision":32,
     "average":"micro",
-    "epochs":10,
+    "epochs":15,
     "device":torch.device("cuda" if torch.cuda.is_available() else "cpu"),
 }
