@@ -34,26 +34,39 @@ import time
 def train(checkpoint_dir=None, data_dir=None, data_config=None):
    
     config = data_config 
-    # Device and Loss Function
+    # Device
     device = config['device']
-    criterion = nn.CrossEntropyLoss()
 
     # Tokenizer
     tokenizer = BertTokenizer.from_pretrained(config['model_name'])
     
     # Label Dictionary
-    label_dict = get_label_dict(config)
+    label_dict, weights = get_label_dict(config)
+
+    #Loss
+    weights = weights.to(device=device)
+    criterion = nn.CrossEntropyLoss(weight=weights)
     
     # DataLoaders - Train, Test and Validation
     train_loader, val_loader, test_loader = load_data(config, label_dict, tokenizer)
     
-    # Model
-    model = DialogActClassificationWE(
+    
+    # Model Word Embeddings only
+    """model = DialogActClassificationWE(
             model_name=config['model_name'],
             hidden_size=config['hidden_size'],
             num_classes=config['num_classes'],
             device=config['device']
         )
+    # Model Word Embedding with Prosody
+    """
+    model = DialogActClassificationProsody(
+            model_name=config['model_name'],
+            hidden_size=config['hidden_size'],
+            num_classes=config['num_classes'],
+            device=config['device']
+        )
+
 
     model.to(device)
     
@@ -73,7 +86,11 @@ def train(checkpoint_dir=None, data_dir=None, data_config=None):
             attention_mask = batch['attention_mask'].to(device=device)
             targets = (batch['label'].squeeze()).to(device=device)
             seq_len = batch['seq_len'].to(device=device)
-            data = {'input_ids':input_ids, 'attention_mask':attention_mask, 'label':targets, 'seq_len':seq_len}
+            # Speech
+            pitch = batch['pitch'].to(device=device)
+            freq = batch['freq'].to(device=device)
+            # Data Dictionary
+            data = {'input_ids':input_ids, 'attention_mask':attention_mask, 'label':targets, 'seq_len':seq_len, 'pitch':pitch, 'freq':freq}
             logits = model(data)
             loss = criterion(logits, targets)
             epoch_loss.append(loss.item())
@@ -102,9 +119,9 @@ def train(checkpoint_dir=None, data_dir=None, data_config=None):
         #print("Time difference for each Epoch: {}".format(end_time-start_time))
         start_time = time.time()
 
-    test_accuracy, f1_score = test_net(test_loader, model, device)  
+    test_accuracy, f1_score, f1_per_cls = test_net(test_loader, model, device)  
     print("f1-score: ",f1_score)
-    print("Test Accuracy: ", test_accuracy)
+    print("f1-score per class: ", f1_per_cls)
     # == Train Loss Curves ==
     plt.figure(figsize=(15,7))
     plt.subplot(2, 1, 1)

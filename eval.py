@@ -15,7 +15,9 @@ def eval_net(model, loader, device, criterion):
             attention_mask = batch['attention_mask'].to(device=device)
             labels = (batch['label'].squeeze()).to(device=device)
             seq_len = batch['seq_len'].to(device=device)
-            data = {'input_ids':input_ids, 'attention_mask':attention_mask, 'label':labels, 'seq_len':seq_len}
+            pitch = batch['pitch'].to(device=device)
+            freq = batch['freq'].to(device=device)
+            data = {'input_ids':input_ids, 'attention_mask':attention_mask, 'label':labels, 'seq_len':seq_len, 'pitch':pitch, 'freq':freq}
             logits = model(data)            
             
             # Accuracy           

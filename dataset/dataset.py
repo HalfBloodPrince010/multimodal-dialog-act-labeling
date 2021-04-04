@@ -5,7 +5,7 @@ import pandas as pd
 
 class DialogDataset(Dataset):
     
-    def __init__(self, tokenizer, data, text_field = "da_token", label_field="da_label", filenum="filenum", speaker="true_speaker", s_time="start_time", e_time="end_time", max_len=512, label_dict = None):
+    def __init__(self, tokenizer, data, speech, text_field = "da_token", label_field="da_label", filenum="filenum", speaker="true_speaker", s_time="start_time", e_time="end_time", max_len=512, label_dict = None):
         
         """
         Process the text, here in each row, we have a word, group them by sentenceID and then form a list[str],which can be passed to the tokenizer.
@@ -35,6 +35,12 @@ class DialogDataset(Dataset):
         self.input_ids = data['input_ids']
 
         self.attention_mask = data['attention_mask']
+
+        # Speech
+
+        self.pitch = speech['pitch']
+
+        self.freq = speech['freq']
         
         self.label_dict = label_dict
         # Update the Label dictionary, which wasn't done in trainer class, Training data has only 41 labels, migth cause problem during val and test, hence update.
@@ -87,6 +93,12 @@ class DialogDataset(Dataset):
 
         attention_mask = self.attention_mask[index]
 
+        # Speech
+
+        pitch = torch.from_numpy(self.pitch[index]).float()
+        #print("From dataset:", type(pitch[0]))
+        freq = torch.from_numpy(self.freq[index]).float()
+
         return {
             "text":text,
             "input_ids":input_ids,
@@ -100,4 +112,6 @@ class DialogDataset(Dataset):
             "start_time":start_time,
             "end_time":end_time,
             "label":torch.tensor([label], dtype=torch.long),
+            "pitch":pitch,
+            "freq":freq
         }

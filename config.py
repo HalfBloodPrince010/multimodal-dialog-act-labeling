@@ -16,8 +16,8 @@ config = {
 
     #Model
     "model_name":"bert-base-uncased",
-    "hidden_size":768,
-    "num_classes":43, # There are 43 classes in Switchboard Corpus
+    "hidden_size":786,
+    "num_classes":41, # There are 41 classes in Switchboard Corpus
     
     # Training
     "save_dir":"./",

@@ -14,7 +14,9 @@ def test_net(loader, model, device):
             attention_mask = batch['attention_mask'].to(device=device)
             labels = (batch['label'].squeeze()).to(device=device)  
             seq_len = batch['seq_len'].to(device=device)
-            data = {'input_ids':input_ids, 'attention_mask':attention_mask, 'label':labels, 'seq_len':seq_len}
+            pitch = batch['pitch'].to(device=device)
+            freq = batch['freq'].to(device=device)
+            data = {'input_ids':input_ids, 'attention_mask':attention_mask, 'label':labels, 'seq_len':seq_len, 'pitch':pitch, 'freq':freq}
             label += labels.cpu()
             outputs = model(data)          
             _, predicted  = torch.max(outputs.data, 1)        
@@ -24,6 +26,6 @@ def test_net(loader, model, device):
     
     accuracy = (correct/total)
     f1 = f1_score(label, pred, average='micro')
-    
+    f1_individual = f1_score(label, pred, average=None) 
     print("Test Accuracy : ", accuracy)
-    return accuracy, f1
+    return accuracy, f1, f1_individual
