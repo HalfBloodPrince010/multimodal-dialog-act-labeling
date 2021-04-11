@@ -11,7 +11,7 @@ config = {
     "pitch":os.path.join(os.getcwd(),'data/pitch_json'),
 
     "max_len":128,
-    "batch_size":128,
+    "batch_size":64,
     "num_workers":4,
 
     #Model

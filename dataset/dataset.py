@@ -41,6 +41,8 @@ class DialogDataset(Dataset):
         self.pitch = speech['pitch']
 
         self.freq = speech['freq']
+
+        self.word_level = True
         
         self.label_dict = label_dict
         # Update the Label dictionary, which wasn't done in trainer class, Training data has only 41 labels, migth cause problem during val and test, hence update.
@@ -48,6 +50,8 @@ class DialogDataset(Dataset):
         #if label_dict is not None: 
         classes = sorted(set(self.acts))
         
+        self.zeros = torch.zeros((127, 9), dtype=float)
+
         for cls in classes:
             if cls not in self.label_dict.keys():
                 self.label_dict[cls]=len(self.label_dict.keys())
@@ -59,6 +63,13 @@ class DialogDataset(Dataset):
     def label_dict(self):
         return self.label_dict
     
+    def preprocess(self, pitch, freq):
+        pos = pitch.shape[0]
+        pitch_m = torch.cat((pitch, self.zeros[0:127-pos,:]), 0)
+        freq_m = torch.cat((freq, self.zeros[0:127-pos,:]), 0)
+        
+        return pitch_m, freq_m
+
     def __getitem__(self, index):
 
         text = self.text[index]
@@ -90,14 +101,18 @@ class DialogDataset(Dataset):
         end_time = self.end_time[index]
 
         input_ids = self.input_ids[index]
-
+        
         attention_mask = self.attention_mask[index]
 
         # Speech
-
-        pitch = torch.from_numpy(self.pitch[index]).float()
-        #print("From dataset:", type(pitch[0]))
-        freq = torch.from_numpy(self.freq[index]).float()
+        #pitch = torch.from_numpy(self.pitch[index]).float()
+        pitch = self.pitch[index]
+        
+        #freq = torch.from_numpy(self.freq[index]).float()
+        freq = self.freq[index]
+        
+        if self.word_level:
+            pitch, freq = self.preprocess(pitch, freq)
 
         return {
             "text":text,

@@ -1,5 +1,6 @@
 from models.DialogActClassificationProsody import DialogActClassificationProsody
 from models.DialogActClassificationWE import DialogActClassificationWE
+from models.DialogActClassificationProsodyWord import DialogActClassificationProsodyWord
 from eval import eval_net
 from test import test_net
 from utils.utils import load_data, get_label_dict
@@ -45,7 +46,7 @@ def train(checkpoint_dir=None, data_dir=None, data_config=None):
 
     #Loss
     weights = weights.to(device=device)
-    criterion = nn.CrossEntropyLoss(weight=weights)
+    criterion = nn.CrossEntropyLoss()
     
     # DataLoaders - Train, Test and Validation
     train_loader, val_loader, test_loader = load_data(config, label_dict, tokenizer)
@@ -60,7 +61,7 @@ def train(checkpoint_dir=None, data_dir=None, data_config=None):
         )
     # Model Word Embedding with Prosody
     """
-    model = DialogActClassificationProsody(
+    model = DialogActClassificationProsodyWord(
             model_name=config['model_name'],
             hidden_size=config['hidden_size'],
             num_classes=config['num_classes'],
